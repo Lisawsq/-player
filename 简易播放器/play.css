@@ -1,0 +1,99 @@
+html,
+body {
+    height: 100%;
+    margin: 0;
+}
+
+body {
+    position: relative;
+    text-align: center;
+    color: white;
+    background-color: black;
+    overflow: hidden;
+}
+
+#bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}
+
+#bg img {
+    filter: blur(8px);
+    height: 100%;
+}
+
+#song {
+    font-size: 2.9vh;
+    line-height: 9vh;
+}
+
+#singer {
+    font-size: 2.5vh;
+}
+
+#box1 {
+    height: 55vh;
+}
+
+#box1 img {
+    width: 35vh;
+    height: 35vh;
+    border-radius: 50%;
+    margin: 5vh 0 0;
+    animation: rotate 3s linear infinite;
+}
+
+#box2 {
+    height: 55vh;
+    display: none;
+}
+
+#timeRange {
+    width: 90%;
+    margin: auto;
+    display: flex;
+}
+
+#timeRange input {
+    flex-grow: 1;
+    /* margin: 0 10px; */
+}
+
+#btns {
+    margin: 6vh 0;
+    /* display: flex;
+    justify-content: center;
+    align-items: center; */
+}
+
+#btns img {
+    width: 7vh;
+}
+
+#btns img:nth-child(2) {
+    width: 9vh;
+    margin: 0 15px;
+    vertical-align: sub;
+}
+footer{
+    display: none;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    z-index: 2;
+    background-color: aqua;
+    text-align: left;
+}
+@keyframes rotate {
+    from {
+        transform: rotate(0)
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}

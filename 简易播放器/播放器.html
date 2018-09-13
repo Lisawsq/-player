@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="play.css">
+    <link rel="stylesheet" href="font-awesome/css/font-awesome.css">
+    <title>播放器</title>
+</head>
+
+<body>
+    <!-- 音频 -->
+    <audio></audio>
+    <!-- 背景图 -->
+    <div id="bg">
+        <img src="./images/wf.png" alt="">
+    </div>
+    <header id="song">传奇</header>
+    <mian>
+        <div id="box1">
+            <!-- 王菲 -->
+            <div id="singer">王菲</div>
+            <img src="./images/wf.png" alt="">
+            <p id="lrc">传奇</p>
+        </div>
+        <!-- 显示歌词 -->
+        <div id="box2"></div>
+
+        <!-- 时间条 -->
+        <div id="timeRange">
+            <span id="timestart">00:00</span>
+            <input type="range" name="" id="" value="0" max="253">
+            <span id="allTime">4:02</span>
+        </div>
+        <!-- 按钮 -->
+        <div id="btns">
+            <img src="./img/prev.png" alt="上一首">
+            <img src="./img/pause.png" alt="暂停/播放">
+            <img src="./img/next.png" alt="下一首">
+        </div>
+        <!-- 声音 -->
+        <div id="volumes">
+            <span class="icon-volume-down"></span>
+            <input type="range" name="" id="volumnRange" style="vertical-align: sub;">
+            <span class="icon-volume-up"></span>
+        </div>
+    </mian>
+    <footer>
+        <ul></ul>
+        <div onclick="closeList()">关闭</div>
+    </footer>
+    <script>
+        //声明变量提前
+        var lrcs = [];
+    </script>
+    <script src="lrcs/传奇.js"></script>
+    <script src="lrcs/知道不知道.js"></script>
+    <script>
+        var list = [{
+                song: '传奇',
+                singer: '王菲',
+                src: 'mp/mp3/传奇.mp3',
+                imgSrc: 'images/wf.png'
+            },
+            {
+                song: '知道不知道',
+                singer: '刘若英',
+                src: 'mp/mp3/知道不知道.mp3',
+                imgSrc: 'images/lry.jpg'
+            },
+        ]
+        var bg = document.querySelector('#bg img');
+        var box1 = document.getElementById('box1');
+        var song = document.getElementById('song');
+        var singer = document.getElementById('singer');
+        var singerImg = document.querySelector('#box1 img');
+        var lrc = document.getElementById('lrc');
+        var box2 = document.getElementById('box2');
+        var audio = document.querySelector('audio');
+        var btns = document.querySelectorAll('#btns img');
+        var volumes = document.querySelectorAll('#volumes *')
+
+        //默认当前播放歌曲
+        var songindex = 0;
+        //播放音乐
+        function start() {
+
+            var songMsg = list[songindex];
+            bg.src = songMsg.imgSrc;
+            singerImg.src = songMsg.imgSrc;
+            song.innerText = songMsg.song;
+            singer.innerText = songMsg.singer;
+            audio.src = songMsg.src;
+            singerImg.style.animationPlayState = 'paused';
+            //加载资源
+            audio.load();
+            //播放音频
+            // audio.play();
+            showTime();
+        }
+        start();
+
+        btns[1].onclick = function () {
+            if (audio.paused) {
+                audio.play();
+
+            } else {
+                audio.pause();
+            }
+        }
+        //音乐暂停
+        audio.onpause = function () {
+            btns[1].src = 'img/pause.png';
+            singerImg.style.animationPlayState = 'paused';
+        }
+        //音乐播放
+        audio.onplaying = function () {
+            btns[1].src = 'img/play.png';
+            singerImg.style.animationPlayState = 'running';
+
+        }
+        //上一首
+        btns[0].onclick = function () {
+            songindex = --songindex < 0 ? list.length - 1 : songindex;
+            start();
+        }
+        //下一首
+        btns[2].onclick = function () {
+            songindex = ++songindex > list.length - 1 ? 0 : songindex;
+            start();
+        }
+        //监听音乐播放完了
+        audio.onended = function () {
+            songindex = ++songindex > list.length - 1 ? 0 : songindex;
+            start();
+            audio.play();
+        }
+        //声音设置
+        volumes[1].value = 100;
+        volumes[1].max = 100;
+        //音量-
+        volumes[0].onclick = function () {
+            volumes[1].value = volumes[1].value - 10;
+            audio.volume = volumes[1].value / 100;
+            console.log(volumes[1].value)
+
+        }
+        //音量+
+        volumes[2].onclick = function () {
+            //+会起到拼接作用，会输出string，所以要转成数字类型
+            volumes[1].value = Number(volumes[1].value) + 10;
+            audio.volume = volumes[1].value / 100;
+            // console.log(typeof volumes[1].value)
+
+        }
+        volumes[1].onchange = function () {
+            audio.volume = volumes[1].value / 100;
+        }
+        //显示时间
+        function showTime() {
+            //获取当前播放时间
+            var tStart = document.getElementById('timestart');
+            //获取当前播放的总时间
+            var allTime = document.getElementById('allTime');
+            tStart.innerText = formatTime(audio.currentTime);
+            //时间条播放当前值
+            var tRange = document.querySelector('#timeRange input');
+
+            if (!isNaN(audio.duration)) {
+                allTime.innerText = formatTime(audio.duration);
+                //时间条
+                tRange.max = audio.duration;
+                tRange.value = audio.currentTime;
+                //对时间条进行点击改变，进行歌曲进度切换
+                tRange.onchange = function () {
+                    audio.currentTime = this.value;
+
+                }
+                //显示歌词
+                showLrcs();
+            }
+
+        }
+
+
+        //过滤时间
+        function formatTime(time) {
+            time = parseInt(time);
+            var s = time % 60;
+            var m = parseInt(time / 60);
+
+
+            s = s < 10 ? '0' + s : s;
+            m = m < 10 ? '0' + m : m;
+
+            return m + ':' + s
+        }
+
+        //显示歌词函数
+        function showLrcs() {
+            //显示当前歌名
+            var song = list[songindex].song;
+            var lrcNow = lrcs[song];
+            // console.log(lrcNow)
+            var lrctime = formatTime(audio.currentTime + lrcNow.offset);
+            // console.log(lrcNow[lrctime]);
+            //显示歌词(一句)
+            if (lrcNow[lrctime] != undefined) {
+                lrc.innerText = lrcNow[lrctime];
+            }
+
+            //显示多条歌词
+            // console.log(Object.keys(lrcNow));
+            var keys = Object.keys(lrcNow);
+            var index = keys.indexOf(lrctime);
+            if (index != -1) {
+                box2.innerText = '';
+                //有歌词存在
+                //唱1，2，3句显示  1-7
+                //唱4 展示2-8
+                for (var i = index; i < index + 7 && keys.length; i++) {
+                    // console.log(keys[i])
+                    var key = keys[i];
+                    var p = document.createElement('p');
+                    p.innerText = lrcNow[key];
+                    box2.appendChild(p);
+                }
+            }
+        }
+        showLrcs();
+        lrc.onclick = function () {
+            box1.style.display = 'none';
+            box2.style.display = 'block';
+        }
+        //
+        box2.onclick = function () {
+            box1.style.display = 'block';
+            box2.style.display = 'none';
+        }
+        //展示播放列表
+        function showList() {
+            for (var i = 0; i < list.length; i++) {
+                var li = document.createElement('li');
+                li.innerHTML = list[i].song + '<span>~~~' + list[i].singer + '</span>';
+                li.index=i;
+                li.onclick=function(){
+                    //播放相对应的歌曲
+                    songIndex=this.index;
+                    start();
+                }
+                document.querySelector('ul').appendChild(li);
+
+            }
+
+        }
+        showList();
+
+//点击图片显示歌单
+singerImg.onclick=function(){
+    document.querySelector('footer').style.display='block';
+}
+
+//点击关闭歌单
+function closeList() {
+    document.querySelector('footer').style.display='none';
+}
+
+
+
+
+
+
+
+        //实时监听时间更新
+        audio.ontimeupdate = showTime;
+    </script>
+</body>
+
+</html>
